@@ -20,6 +20,7 @@ class PathFinding():
         self.target_node = target
 
     def find_path(self,node_map,sleep:float=0):
+        start = time.time()
         heapq.heappush(self.open_node, (self.start_node.f_cost, self.start_node))
         step = 0
         while self.open_node:
@@ -37,7 +38,9 @@ class PathFinding():
             self.used_node.add(curr_node)#.append(curr_node)
 
             if curr_node == self.target_node:
-                print("Get best path")
+                print(f"Get best path: \n\
+                        time execution: {(time.time()-start)*1000:.2f} ms")
+
                 self.get_best_path(curr_node)
                 self.best_path = node_map
                 self.mapqueue.put([node_map,True])
