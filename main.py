@@ -5,6 +5,7 @@ import random
 import numpy as np
 from pathfinding import PathFinding
 from copy import deepcopy
+from threading import Thread
 
 def get_tile_color(node):
    
@@ -15,16 +16,22 @@ def get_tile_color(node):
 
     if node.start_node:
         tile_color = config.START
+        return tile_color
     elif node.target_node:
         tile_color = config.TARGET
+        return tile_color
     
     if node.best_node:
         tile_color = config.BEST_GOLD
+    elif node.selected:
+        tile_color = config.SELECTED_GREEN
+    elif node.taken:
+        tile_color = config.TAKEN_RED
     
     return tile_color
 
 def get_node_from_xy(pos):
-    i = pos[1]//config.BLOCK_H 
+    i = pos[1]//config.BLOCK_H
     j = pos[0]//config.BLOCK_H 
     return [i,j]
 
@@ -45,10 +52,20 @@ def draw_grid(surface):
 
 def game_loop(surface, node_map:list):
     start_node = None
+    target_node = None
     pathfinder = None
     pathfinder = PathFinding(deepcopy(node_map))
+    finding_path = False
 
     while True:
+        if finding_path:
+            node_map,end = pathfinder.mapqueue.get()
+            if end:
+                finding_path = False
+                draw_map(surface, node_map)
+                draw_grid(surface)
+                pygame.display.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -67,26 +84,28 @@ def game_loop(surface, node_map:list):
                     if start_node is None:
                         start_node = node_map[i][j]
                         start_node.start_node = True
-                    else:
+                    elif target_node is None:
                         target_node = node_map[i][j]
                         target_node.target_node = True
-                        if pathfinder is not None and pathfinder.best_path is None:
+                        if pathfinder is not None:
                             pathfinder.set_start_target(start=start_node,
                                                         target=target_node)
-                        else:
-                            node_map = pathfinder.reset()
-                            del pathfinder
-                            del start_node
-                            start_node = None
-                            pathfinder = PathFinding(deepcopy(node_map))
+                    elif pathfinder.best_path is not None:
+                        node_map = pathfinder.reset()
+                        del pathfinder, start_node, target_node
+                        start_node = None
+                        target_node = None
+                        pathfinder = PathFinding(deepcopy(node_map))
 
                 elif event.button == 2:
-                    node_map = pathfinder.find_path(node_map)
-                    
+                    t = Thread(target=pathfinder.find_path, args=[node_map,config.SLEEP])
+                    t.start()
+                    finding_path = True
 
-                
         draw_map(surface, node_map)
         draw_grid(surface)
+        if finding_path:
+            pathfinder.triggerq.put(True)
         pygame.display.update()
 
 def initialize_game():
@@ -110,7 +129,9 @@ class Node():
         self.start_node = False
         self.target_node = False
         
+        self.taken = False
         self.best_node = False
+        self.selected = False
     
     @property
     def f_cost(self):
@@ -129,9 +150,9 @@ class Node():
         dy = abs(self.row - dest.row)
 
         if dx > dy:
-            return 1.47*dy + 1*dx
+            return 1.47*dy + 1*(dx-dy)
 
-        return 1.47*dx + 1*dy
+        return 1.47*dx + 1*(dy-dx)
 
     def calculate_hcost(self,target):
 
