@@ -6,6 +6,7 @@ import numpy as np
 from pathfinding import PathFinding
 from copy import deepcopy
 from threading import Thread
+random.seed(config.SEED)
 
 def get_tile_color(node):
    
@@ -119,9 +120,9 @@ class Node():
     def __init__(self,h,w,grid_pos,center,walkable):
         self.h ,self.w = h, w
         self.grid_pos = grid_pos
-        self.center = center
+        self.center = tuple([c for c in center])
         self.walkable = walkable
-        self.topleft = [v for v in self.center - np.array([w/2,h/2])]
+        self.topleft = [v for v in center - np.array([w/2,h/2])]
         self.g_cost = 0
         self.h_cost = 0
         self.parent = None
@@ -165,7 +166,13 @@ class Node():
             self.h_cost = 1.47*dx + 1*(dy-dx)
     
     def __eq__(self,node) -> bool:
-        return all(np.equal(self.center,node.center))
+        return self.center == node.center
+    
+    def __lt__(self, other):
+        return self.f_cost < other.f_cost
+    
+    def __hash__(self):
+        return hash(self.center)
 
 def create_map():
     node_map = []

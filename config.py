@@ -19,3 +19,4 @@ TARGET = (255, 255, 0)
 
 TITLE = "NodeMapTest"
 SLEEP = 0.0
+SEED = 1234
