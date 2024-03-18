@@ -26,7 +26,7 @@ class PathFinding():
         while self.open_node:
             step += 1
             if step > 1:
-                self.mapqueue.put([node_map,False])
+                self.mapqueue.put([node_map,["...","..."],False])
                 _ = self.triggerq.get()
                 time.sleep(sleep)
 
@@ -38,12 +38,12 @@ class PathFinding():
             self.used_node.add(curr_node)#.append(curr_node)
 
             if curr_node == self.target_node:
-                print(f"Get best path: \n\
-                        time execution: {(time.time()-start)*1000:.2f} ms")
+                exec_time = f"{(time.time()-start)*1000:.2f} ms"
+                total_cost = f"{curr_node.f_cost:.2f}"
 
                 self.get_best_path(curr_node)
                 self.best_path = node_map
-                self.mapqueue.put([node_map,True])
+                self.mapqueue.put([node_map,[exec_time,total_cost],True])
                 return
 
             for i, j in self.get_neighbours(curr_node):
@@ -63,7 +63,7 @@ class PathFinding():
                     heapq.heappush(self.open_node, (neigh_node.f_cost, neigh_node))
 
         print("No more open_node Nodes")
-        self.mapqueue.put([node_map,True])
+        self.mapqueue.put([node_map,[None,None],True])
         self.best_path = node_map
         return 
     

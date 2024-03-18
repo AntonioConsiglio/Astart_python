@@ -7,6 +7,7 @@ NUMBER_OF_ROWS = 20
 BLOCK_W = SCREEN_WIDTH // NUMBER_OF_COLOUMNS
 BLOCK_H =  SCREEN_HEIGHT // NUMBER_OF_ROWS
 
+BACKGROUND = (50, 50, 50)
 TAKEN_RED = (255, 0, 0) # node already taken
 WALK_BLUE = (55, 55, 255) # node untaken
 UNWALK_BLACK = (0, 0, 0) # unwalkable
@@ -17,6 +18,7 @@ GREY = (150, 150, 150)
 START = (0, 255, 255)
 TARGET = (255, 255, 0)
 
-TITLE = "NodeMapTest"
+
 SLEEP = 0.0
 SEED = 1234
+UNWALKABLE_RATIO = 0.2
