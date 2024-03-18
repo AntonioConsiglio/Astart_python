@@ -1,4 +1,4 @@
-## Intro
+## A* PyGame PathFinder
 This is an easy visual representation of the algorithm A* for path finding.
 
 ![](https://github.com/AntonioConsiglio/Astart_python/blob/heap_optim/gif/Agif.gif)
