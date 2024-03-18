@@ -1,6 +1,8 @@
 ## Intro
 This is an easy visual representation of the algorithm A* for path finding.
 
+![](https://github.com/AntonioConsiglio/Astart_python/blob/heap_optim/gif/Agif.gif)
+
 What is possible to do with that:
 
 - Generate a visual map with random obstacle (The probability that a block is an obstacle is 15% default)
